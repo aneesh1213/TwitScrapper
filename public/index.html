@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Twitter Trends Scraper</title>
+</head>
+<body>
+  <h1>Twitter Trends Scraper</h1>
+  <button id="scrape-button">Scrape Twitter Trends</button>
+  <div id="results"></div>
+
+  <script>
+    document
+      .getElementById("scrape-button")
+      .addEventListener("click", async () => {
+        const resultDiv = document.getElementById("results");
+        resultDiv.innerHTML = "Scraping data...";
+
+        try {
+          const response = await fetch("/scrape-twitter");
+          const data = await response.json();
+
+          if (data.error) {
+            resultDiv.innerHTML = `<p>Error: ${data.error}</p>`;
+          } else {
+            const trendsHtml = data.data.trends
+              .map((trend, index) => `<li>${index + 1}. ${trend}</li>`)
+              .join("");
+            resultDiv.innerHTML = `
+              <p>Scraped at: ${data.data.timestamp}</p>
+              <p>IP Address: ${data.data.ip}</p>
+              <ul>${trendsHtml}</ul>
+            `;
+          }
+        } catch (err) {
+          resultDiv.innerHTML = `<p>Error: ${err.message}</p>`;
+        }
+      });
+  </script>
+</body>
+</html>
